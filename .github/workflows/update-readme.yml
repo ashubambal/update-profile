@@ -1,31 +1,30 @@
-name: ⏰ Update README Automatically
+name: 🔄 Update README
 
 on:
   schedule:
-    - cron: '0 */12 * * *' # Runs every 12 hours
-  workflow_dispatch:
+    - cron: '0 */12 * * *'  # Runs every 12 hours
+  workflow_dispatch:        # Allows manual trigger
 
 jobs:
-  update-readme:
+  update:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repo
+      - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Run readme updater
-        run: |
-          echo "📝 Updating README dynamically..."
-          # You can use curl or node/python scripts here to update README.md
-          # Example: curl to fetch top languages, update using sed
-          # Replace this block with your own logic
-          
-          python update_readme.py
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-      - name: Commit & Push Changes
+      - name: 📜 Run update script
+        run: python update_readme.py
+
+      - name: 🟢 Commit and push if changes
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "🔄 Auto-updated README" || echo "No changes to commit"
+          git diff --quiet && git diff --staged --quiet || git commit -m "🔄 Auto-update README"
           git push
